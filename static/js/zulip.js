@@ -1,3 +1,7 @@
+// WHEN ADDING NEW GLOBAL VARIABLES, you must add them to
+// the whitelist in tools/jslint/check-all.js in order for
+// tests to pass.
+
 var all_msg_list = new MessageList(
     undefined, undefined,
     {muting_enabled: false}
@@ -9,6 +13,7 @@ var narrowed_msg_list;
 var current_msg_list = home_msg_list;
 
 var recent_subjects = new Dict({fold_case: true});
+var recent_private_messages = [];
 
 var queued_mark_as_read = [];
 var queued_flag_timer;

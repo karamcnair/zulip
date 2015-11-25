@@ -60,7 +60,7 @@ var globals =
     + ' viewport process_loaded_for_unread'
     + ' have_scrolled_away_from_top'
     + ' maybe_scroll_to_selected recenter_pointer_on_display suppress_scroll_pointer_update'
-    + ' fast_forward_pointer recent_subjects unread_subjects'
+    + ' fast_forward_pointer recent_subjects unread_subjects recent_private_messages'
     + ' furthest_read server_furthest_read'
     ;
 

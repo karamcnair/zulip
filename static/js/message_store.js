@@ -58,6 +58,41 @@ exports.process_message_for_recent_subjects = function process_message_for_recen
     recent_subjects.set(stream, recents);
 };
 
+exports.process_message_for_recent_private_messages = function process_message_for_recent_private_messages(message, remove_message) {
+    var current_timestamp = 0;
+
+    if (recent_private_messages.length === 0)  {
+        recent_private_messages = [];
+    }
+
+    var found = false;
+    var i = 0;
+
+    // If the conversation is already in the list, we need to update timestamp
+    // KLM TODO This is not a pretty loop & could be improved.
+    while (!found && i < recent_private_messages.length) {
+        if (recent_private_messages[i].reply_to === message.reply_to) {
+            found = true;
+        }
+        else {
+            i++;
+        }
+    }
+
+    var new_conversation = {reply_to: message.reply_to,
+                            display_reply_to: message.display_reply_to,
+                            timestamp: Math.max(message.timestamp, current_timestamp)};
+    if (!found) {
+        recent_private_messages.push(new_conversation);
+    }  else {
+        recent_private_messages[i] = new_conversation;
+    }
+
+    recent_private_messages.sort(function (a, b) {
+        return b.timestamp - a.timestamp;
+    });
+};
+
 function set_topic_edit_properties(message) {
     message.always_visible_topic_edit = false;
     message.on_hover_topic_edit = false;
@@ -120,6 +155,7 @@ function add_message_metadata(message) {
                 get_private_message_recipient(message, 'email'));
         message.display_reply_to = get_private_message_recipient(message, 'full_name', 'email');
 
+        exports.process_message_for_recent_private_messages(message);
         involved_people = message.display_recipient;
         break;
     }
@@ -333,6 +369,7 @@ exports.update_messages = function update_messages(events) {
     }
     unread.update_unread_counts();
     stream_list.update_streams_sidebar();
+    stream_list.update_private_messages();
 };
 
 exports.insert_new_messages = function insert_new_messages(messages) {
@@ -383,6 +420,7 @@ exports.insert_new_messages = function insert_new_messages(messages) {
     unread.process_visible();
     notifications.received_messages(messages);
     stream_list.update_streams_sidebar();
+    stream_list.update_private_messages();
 };
 
 function process_result(messages, opts) {
@@ -410,6 +448,7 @@ function process_result(messages, opts) {
     }
 
     stream_list.update_streams_sidebar();
+    stream_list.update_private_messages();
 
     if (opts.cont !== undefined) {
         opts.cont(messages);
